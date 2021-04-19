@@ -29,20 +29,32 @@ interface Product {
 }
 
 const Dashboard: React.FC = () => {
-  const { addToCart } = useCart();
+  const { addToCart, increment, products: cartProducts } = useCart();
 
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO
+      try {
+        const { data } = await api.get<Product[]>('/products');
+
+        setProducts(data);
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     loadProducts();
   }, []);
 
   function handleAddToCart(item: Product): void {
-    // TODO
+    const cartProduct = cartProducts.find(({ id }) => id === item.id);
+
+    if (cartProduct) {
+      increment(cartProduct.id);
+    } else {
+      addToCart(item);
+    }
   }
 
   return (
